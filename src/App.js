@@ -1,52 +1,70 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 class App extends Component {
   state = {
-    testArray: ["hello","good afternoon", "good evening", "goodbye", "good day"]
+    testArray: ["hello", "good afternoon", "good evening", "goodbye", "good day"],
+    petArray: ["cat", "dog", "fish", "guinea pig", "rabbit", "parakeet"],
+    yetAnotherArray: [1,2,3,4,5,6,7,8,9]
   }
 
-  handleChange = e => {
-    const testArray = [...this.state.testArray];
-    testArray[e.target.id] = e.target.value;
-    this.setState({ testArray })
+  handleListChange = e => {
+    const changeState = e.target.getAttribute("data-state");
+    const updatedList = [...this.state[changeState]];
+    updatedList[e.target.id] = e.target.value;
+    this.setState({ [changeState]: updatedList });
   }
 
-  handleAdd = e => {
+  handleListAppend = e => {
     e.preventDefault();
-    this.setState({ testArray: [...this.state.testArray, ""] });
+    const changeState = e.target.getAttribute("data-state");
+    this.setState({ [changeState]: [...this.state[changeState], ""] });
   }
 
-  handleDel = e => {
+  handleListDelete = e => {
     e.preventDefault();
-    this.setState({ testArray: this.state.testArray.slice(0, e.target.id).concat(this.state.testArray.slice(parseInt(e.target.id)+1)) });
+    const changeState = e.target.getAttribute("data-state");
+    this.setState({ [changeState]: this.state[changeState].slice(0, e.target.id).concat(this.state[changeState].slice(parseInt(e.target.id)+1)) });
   }
 
-  render() {
+  renderList = list => {
     return (
-      <form style={{ "display": "flex", "flexDirection": "column" }}>
+      <Fragment>
         <button
+          data-state={list}
           style={{"width":"50%"}}
-          onClick={this.handleAdd}
+          onClick={this.handleListAppend}
         >Add</button>
         {
-          this.state.testArray.map((greeting, idx) => {
+          this.state[list].map((greeting, idx) => {
             return (
               <div key={idx}>
                 <input
-                  style={{"width":"50%"}}
+                  style={{ "width": "50%" }}
+                  data-state={list}
                   id={idx}
-                  value={this.state.testArray[idx]}
-                  onChange={this.handleChange}
+                  value={this.state[list][idx]}
+                  onChange={this.handleListChange}
                 />
                 <button
                   style={{ "width": "20px" }}
+                  data-state={list}
                   id={idx}
-                  onClick={this.handleDel}
+                  onClick={this.handleListDelete}
                 >X</button>
               </div>
             )
           })
         }
+      </Fragment>
+    )
+  }
+
+  render() {
+    return (
+      <form style={{ "display": "flex", "flexDirection": "column" }} onSubmit={this.handleSubmit}>
+        {this.renderList("testArray")}
+        {this.renderList("petArray")}
+        {this.renderList("yetAnotherArray")}
       </form>
     );
   }
